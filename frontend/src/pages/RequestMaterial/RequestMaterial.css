@@ -1,0 +1,38 @@
+.request-container {
+  padding: 32px;
+  max-width: 500px;
+  margin: auto;
+}
+
+.request-container h2 {
+  color: #166534;
+  margin-bottom: 20px;
+}
+
+.request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.request-form input,
+.request-form select,
+.request-form textarea {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.request-form textarea {
+  min-height: 90px;
+}
+
+.request-form button {
+  background: #15803d;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

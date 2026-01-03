@@ -6,8 +6,7 @@ import Impact from "./pages/Impact/Impact";
 import Auth from "./pages/Auth/Auth";
 import Profile from "./pages/Profile/Profile";
 import MapView from "./pages/MapView/MapView";
-
-
+import RequestMaterial from "./pages/RequestMaterial/RequestMaterial";
 
 
 
@@ -23,6 +22,8 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/map" element={<MapView />} />
+        <Route path="/request" element={<RequestMaterial />} />
+
 
       </Routes>
     </BrowserRouter>

@@ -1,19 +1,33 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Marketplace.css";
 
 function Marketplace() {
   const [materials, setMaterials] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
+    // materials still from backend for now
     fetch("http://localhost:5000/api/materials")
       .then((res) => res.json())
       .then((data) => setMaterials(data));
+
+    // requests from Firestore
+    getDocs(collection(db, "requests")).then((snapshot) => {
+      setRequests(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
+    });
   }, []);
 
   const filtered = materials.filter((item) => {
@@ -34,19 +48,25 @@ function Marketplace() {
       return;
     }
 
-    await fetch("http://localhost:5000/api/requests", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        materialId: item.id,
-        materialName: item.name,
-        supplierId: item.uploadedBy.uid,
-        supplierName: item.uploadedBy.name,
-        consumerId: user.uid,
-        consumerName: user.name || user.email,
-        message: "Interested in this material",
-      }),
+    await addDoc(collection(db, "requests"), {
+      type: "material",
+      materialId: item.id,
+      materialName: item.name,
+      supplierId: item.uploadedBy.uid,
+      supplierName: item.uploadedBy.name,
+      consumerId: user.uid,
+      consumerName: user.name || user.email,
+      status: "pending",
+      createdAt: new Date(),
     });
+
+    setRequests((prev) => [
+      ...prev,
+      {
+        materialId: item.id,
+        consumerId: user.uid,
+      },
+    ]);
 
     alert("Request sent");
   };
@@ -58,7 +78,6 @@ function Marketplace() {
       <div className="marketplace">
         <h2>Available Materials</h2>
 
-        {/* SEARCH + FILTER */}
         <div className="marketplace-controls">
           <input
             placeholder="Search materials, supplier, location..."
@@ -80,20 +99,24 @@ function Marketplace() {
         </div>
 
         <div className="materials-grid">
-          {filtered.map((item) => (
-            <div className="material-card" key={item.id}>
-              {item.image && (
-                <img src={item.image} alt={item.name} />
-              )}
+          {filtered.map((item) => {
+            const alreadyRequested =
+              user &&
+              requests.some(
+                (r) =>
+                  r.materialId === item.id &&
+                  r.consumerId === user.uid
+              );
 
-              <h3>{item.name}</h3>
-              <p><strong>Category:</strong> {item.category}</p>
-              <p><strong>Quantity:</strong> {item.quantity}</p>
+            return (
+              <div className="material-card" key={item.id}>
+                {item.image && (
+                  <img src={item.image} alt={item.name} />
+                )}
 
-              <div className="supplier-location">
-                <p>
-                  <strong>Supplier:</strong> {item.uploadedBy?.name}
-                </p>
+                <h3>{item.name}</h3>
+                <p><strong>Category:</strong> {item.category}</p>
+                <p><strong>Quantity:</strong> {item.quantity}</p>
 
                 <p
                   className="location-link"
@@ -103,22 +126,21 @@ function Marketplace() {
                 >
                   📍 {item.location}
                 </p>
-              </div>
 
-              <div className="card-actions">
-                <button
-                  className="request-btn"
-                  onClick={() => requestMaterial(item)}
-                >
-                  Request
-                </button>
+                <div className="card-actions">
+                  <button
+                    className="request-btn"
+                    disabled={alreadyRequested}
+                    onClick={() => requestMaterial(item)}
+                  >
+                    {alreadyRequested ? "Requested" : "Request"}
+                  </button>
 
-                <button className="chat-btn">
-                  💬 Chat
-                </button>
+                  <button className="chat-btn">💬 Chat</button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
+  const user = JSON.parse(localStorage.getItem("user"));
+
   return (
     <nav className="navbar">
       {/* LOGO */}
@@ -20,7 +22,14 @@ function Navbar() {
           Marketplace
         </NavLink>
 
-        
+        <NavLink
+          to="/request"
+          className={({ isActive }) =>
+            isActive ? "nav-link active" : "nav-link"
+          }
+        >
+          Request
+        </NavLink>
 
         <NavLink
           to="/upload"
@@ -30,6 +39,7 @@ function Navbar() {
         >
           Upload
         </NavLink>
+
         <NavLink
           to="/map"
           className={({ isActive }) =>
@@ -38,7 +48,6 @@ function Navbar() {
         >
           Map
         </NavLink>
-
 
         <NavLink
           to="/impact"
@@ -49,10 +58,16 @@ function Navbar() {
           Impact
         </NavLink>
 
-        {/* AUTH CTA */}
-        <NavLink to="/auth" className="auth-link">
-          Login / Sign Up
-        </NavLink>
+        {/* AUTH / PROFILE (POSITION UNCHANGED) */}
+        {user ? (
+          <NavLink to="/profile" className="auth-link">
+            {user.name ? user.name.split(" ")[0] : "Profile"}
+          </NavLink>
+        ) : (
+          <NavLink to="/auth" className="auth-link">
+            Login / Sign Up
+          </NavLink>
+        )}
       </div>
     </nav>
   );

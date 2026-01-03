@@ -1,59 +1,105 @@
-.upload-container {
-  padding: 40px;
-  max-width: 600px;
+.upload-page {
+  background: #f0fdf4;
+  min-height: 100vh;
+  padding: 40px 0;
+}
+
+.upload-card {
+  background: white;
+  max-width: 520px;
   margin: auto;
+  padding: 28px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-.upload-container h2 {
+.upload-card h2 {
   margin-bottom: 20px;
-  color: #166534;
+  color: #14532d;
 }
 
-.upload-form {
+.upload-card form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-.upload-form label {
-  display: flex;
-  flex-direction: column;
-  font-weight: 500;
-  color: #374151;
-}
-
-.upload-form input,
-.upload-form select,
-.upload-form textarea {
-  margin-top: 6px;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-}
-
-.upload-form button {
-  margin-top: 10px;
+.upload-card input,
+.upload-card select,
+.upload-card textarea {
   padding: 12px;
-  background: #15803d;
-  color: white;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.upload-card textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.location-section {
+  position: relative;
+}
+
+.location-section label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.gps-btn {
+  margin-top: 6px;
+  background: #dcfce7;
   border: none;
-  border-radius: 6px;
+  padding: 8px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
-.upload-form button:hover {
-  background: #166534;
+.suggestions {
+  position: absolute;
+  top: 76px;
+  width: 100%;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  z-index: 20;
 }
-.image-preview {
+
+.suggestion-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.suggestion-item:hover {
+  background: #f0fdf4;
+}
+
+.suggestion-item span {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.preview {
+  width: 100%;
+  border-radius: 16px;
   margin-top: 10px;
 }
 
-.image-preview img {
-  width: 100%;
-  max-height: 220px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-top: 6px;
-  border: 1px solid #d1d5db;
+.submit-btn {
+  background: #15803d;
+  color: white;
+  padding: 12px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
-

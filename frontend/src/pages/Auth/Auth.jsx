@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import { auth } from "../../firebase";
 import {
@@ -9,6 +10,7 @@ import "./Auth.css";
 
 function Auth() {
   const [mode, setMode] = useState("login"); // login | signup
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,13 +23,14 @@ function Auth() {
         const name = e.target.name.value;
         const role = e.target.role.value;
 
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential =
+          await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
 
-        // store minimal user data locally
+        // store user locally
         localStorage.setItem(
           "user",
           JSON.stringify({
@@ -39,14 +42,15 @@ function Auth() {
         );
 
         alert("Account created successfully");
+        navigate("/"); // ✅ redirect to home
       } else {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential =
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
 
-        // keep role simple for now (can be fetched later)
         localStorage.setItem(
           "user",
           JSON.stringify({
@@ -57,6 +61,7 @@ function Auth() {
         );
 
         alert("Login successful");
+        navigate("/"); // ✅ redirect to home
       }
     } catch (error) {
       alert(error.message);
@@ -72,16 +77,16 @@ function Auth() {
           {/* TOGGLE */}
           <div className="auth-toggle">
             <button
+              type="button"
               className={mode === "login" ? "active" : ""}
               onClick={() => setMode("login")}
-              type="button"
             >
               Login
             </button>
             <button
+              type="button"
               className={mode === "signup" ? "active" : ""}
               onClick={() => setMode("signup")}
-              type="button"
             >
               Sign Up
             </button>
@@ -89,7 +94,11 @@ function Auth() {
 
           {/* FORM */}
           <form className="auth-form" onSubmit={handleSubmit}>
-            <h2>{mode === "login" ? "Welcome Back" : "Create Account"}</h2>
+            <h2>
+              {mode === "login"
+                ? "Welcome Back"
+                : "Create Account"}
+            </h2>
 
             {mode === "signup" && (
               <input
@@ -118,7 +127,9 @@ function Auth() {
               <select name="role" required>
                 <option value="">Select Role</option>
                 <option value="student">Student</option>
-                <option value="supplier">Lab / Industry</option>
+                <option value="supplier">
+                  Lab / Industry
+                </option>
               </select>
             )}
 

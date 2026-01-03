@@ -1,27 +1,53 @@
 import { useEffect, useState } from "react";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Profile.css";
 
 function Profile() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const [myRequests, setMyRequests] = useState([]);
+  const [incomingRequests, setIncomingRequests] = useState([]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
+    if (!user) {
       navigate("/auth");
-    } else {
-      setUser(JSON.parse(storedUser));
+      return;
     }
-  }, [navigate]);
+
+    getDocs(collection(db, "requests")).then((snapshot) => {
+      const all = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setMyRequests(
+        all.filter((r) => r.consumerId === user.uid)
+      );
+
+      setIncomingRequests(
+        all.filter((r) => r.supplierId === user.uid)
+      );
+    });
+  }, [user, navigate]);
+
+  const updateStatus = async (id, status) => {
+    await updateDoc(doc(db, "requests", id), {
+      status,
+    });
+
+    setIncomingRequests((prev) =>
+      prev.filter((r) => r.id !== id)
+    );
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/auth");
   };
-
-  if (!user) return null;
 
   return (
     <>
@@ -29,53 +55,63 @@ function Profile() {
 
       <div className="profile-page">
         <div className="profile-card">
-          {/* AVATAR */}
           <div className="profile-avatar">
-            {user.name
-              ? user.name.charAt(0).toUpperCase()
-              : user.email.charAt(0).toUpperCase()}
+            {(user.name || user.email)[0].toUpperCase()}
           </div>
-
-          {/* NAME */}
-          <h2 className="profile-name">
-            {user.name || "User"}
-          </h2>
-
-          {/* ROLE */}
-          <span className={`role-badge ${user.role}`}>
-            {user.role === "supplier" ? "Supplier" : "Student"}
-          </span>
-
-          {/* INFO */}
-          <div className="profile-info">
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-
-            {user.uid && (
-              <p className="uid">
-                <strong>User ID:</strong> {user.uid}
-              </p>
-            )}
-          </div>
-
-          {/* ACTIONS */}
-          <div className="profile-actions">
-            <button onClick={() => navigate("/marketplace")}>
-              Go to Marketplace
-            </button>
-
-            {user.role === "supplier" && (
-              <button onClick={() => navigate("/upload")}>
-                Upload Material
-              </button>
-            )}
-
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
+          <h2>{user.name || "User"}</h2>
+          <p>{user.email}</p>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
+
+        <div className="profile-section">
+          <h3>My Requests</h3>
+          {myRequests.map((req) => (
+            <div className="request-card" key={req.id}>
+              <strong>{req.materialName}</strong>
+              <span className={`status ${req.status}`}>
+                {req.status}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {incomingRequests.length > 0 && (
+          <div className="profile-section">
+            <h3>Requests on My Materials</h3>
+
+            {incomingRequests.map((req) => (
+              <div className="request-card" key={req.id}>
+                <div>
+                  <strong>{req.materialName}</strong>
+                  <p className="sub">
+                    Requested by: {req.consumerName}
+                  </p>
+                </div>
+
+                <div className="request-actions">
+                  <button
+                    className="approve-btn"
+                    onClick={() =>
+                      updateStatus(req.id, "approved")
+                    }
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() =>
+                      updateStatus(req.id, "rejected")
+                    }
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

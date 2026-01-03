@@ -8,6 +8,7 @@ function Marketplace() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     fetch("http://localhost:5000/api/materials")
@@ -15,11 +16,40 @@ function Marketplace() {
       .then((data) => setMaterials(data));
   }, []);
 
-  const filtered = materials.filter((m) => {
-    const matchName = m.name.toLowerCase().includes(search.toLowerCase());
-    const matchCat = category === "All" || m.category === category;
-    return matchName && matchCat;
+  const filtered = materials.filter((item) => {
+    const matchSearch =
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.location.toLowerCase().includes(search.toLowerCase()) ||
+      item.uploadedBy?.name?.toLowerCase().includes(search.toLowerCase());
+
+    const matchCategory =
+      category === "All" || item.category === category;
+
+    return matchSearch && matchCategory;
   });
+
+  const requestMaterial = async (item) => {
+    if (!user) {
+      alert("Please login to request materials");
+      return;
+    }
+
+    await fetch("http://localhost:5000/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        materialId: item.id,
+        materialName: item.name,
+        supplierId: item.uploadedBy.uid,
+        supplierName: item.uploadedBy.name,
+        consumerId: user.uid,
+        consumerName: user.name || user.email,
+        message: "Interested in this material",
+      }),
+    });
+
+    alert("Request sent");
+  };
 
   return (
     <>
@@ -28,10 +58,10 @@ function Marketplace() {
       <div className="marketplace">
         <h2>Available Materials</h2>
 
-        {/* SEARCH & FILTER */}
+        {/* SEARCH + FILTER */}
         <div className="marketplace-controls">
           <input
-            placeholder="Search materials..."
+            placeholder="Search materials, supplier, location..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -40,7 +70,7 @@ function Marketplace() {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option value="All">All Categories</option>
+            <option>All</option>
             <option>Metal</option>
             <option>Plastic</option>
             <option>Electronics</option>
@@ -52,36 +82,41 @@ function Marketplace() {
         <div className="materials-grid">
           {filtered.map((item) => (
             <div className="material-card" key={item.id}>
-              <div className="material-image-wrapper">
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="material-image"
-                  />
-                ) : (
-                  <div className="material-image placeholder">
-                    No Image
-                  </div>
-                )}
-              </div>
+              {item.image && (
+                <img src={item.image} alt={item.name} />
+              )}
 
               <h3>{item.name}</h3>
               <p><strong>Category:</strong> {item.category}</p>
               <p><strong>Quantity:</strong> {item.quantity}</p>
 
-              <p
-                className="location-link"
-                onClick={() =>
-                  navigate(`/map?materialId=${item.id}`)
-                }
-              >
-                📍 {item.location}
-              </p>
+              <div className="supplier-location">
+                <p>
+                  <strong>Supplier:</strong> {item.uploadedBy?.name}
+                </p>
 
-              <button className="request-btn">
-                Request Material
-              </button>
+                <p
+                  className="location-link"
+                  onClick={() =>
+                    navigate(`/map?materialId=${item.id}`)
+                  }
+                >
+                  📍 {item.location}
+                </p>
+              </div>
+
+              <div className="card-actions">
+                <button
+                  className="request-btn"
+                  onClick={() => requestMaterial(item)}
+                >
+                  Request
+                </button>
+
+                <button className="chat-btn">
+                  💬 Chat
+                </button>
+              </div>
             </div>
           ))}
         </div>

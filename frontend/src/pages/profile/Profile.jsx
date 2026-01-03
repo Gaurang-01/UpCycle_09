@@ -1,53 +1,79 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Profile.css";
 
 function Profile() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) {
+      navigate("/auth");
+    } else {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/auth");
+  };
+
+  if (!user) return null;
+
   return (
     <>
       <Navbar />
 
       <div className="profile-page">
-        {/* LEFT PROFILE CARD */}
         <div className="profile-card">
+          {/* AVATAR */}
           <div className="profile-avatar">
-            <span>👤</span>
+            {user.name
+              ? user.name.charAt(0).toUpperCase()
+              : user.email.charAt(0).toUpperCase()}
           </div>
 
-          <h2>Gaurang</h2>
-          <p className="profile-role">Student</p>
+          {/* NAME */}
+          <h2 className="profile-name">
+            {user.name || "User"}
+          </h2>
 
+          {/* ROLE */}
+          <span className={`role-badge ${user.role}`}>
+            {user.role === "supplier" ? "Supplier" : "Student"}
+          </span>
+
+          {/* INFO */}
           <div className="profile-info">
             <p>
-              <strong>Email:</strong> gaurang@email.com
+              <strong>Email:</strong> {user.email}
             </p>
-            <p>
-              <strong>Joined:</strong> Jan 2026
-            </p>
+
+            {user.uid && (
+              <p className="uid">
+                <strong>User ID:</strong> {user.uid}
+              </p>
+            )}
           </div>
 
-          <button className="profile-btn">Edit Profile</button>
-        </div>
+          {/* ACTIONS */}
+          <div className="profile-actions">
+            <button onClick={() => navigate("/marketplace")}>
+              Go to Marketplace
+            </button>
 
-        {/* RIGHT ACTION CARDS */}
-        <div className="profile-actions">
-          <div className="action-card">
-            <h3>Your Uploads</h3>
-            <p>View materials you have uploaded</p>
-          </div>
+            {user.role === "supplier" && (
+              <button onClick={() => navigate("/upload")}>
+                Upload Material
+              </button>
+            )}
 
-          <div className="action-card">
-            <h3>Your Requests</h3>
-            <p>Track requested materials</p>
-          </div>
-
-          <div className="action-card">
-            <h3>Impact Summary</h3>
-            <p>See your sustainability contribution</p>
-          </div>
-
-          <div className="action-card">
-            <h3>Account Settings</h3>
-            <p>Manage account preferences</p>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </div>
       </div>

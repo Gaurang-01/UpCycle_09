@@ -1,35 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./UploadMaterial.css";
 
 function UploadMaterial() {
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageData, setImageData] = useState(null);
-  const [coords, setCoords] = useState(null);
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    if (!user) {
+      alert("Please login to upload materials");
+      navigate("/auth");
+    }
+  }, [user, navigate]);
 
   const [form, setForm] = useState({
     name: "",
     category: "Metal",
     quantity: "",
-    description: "",
     location: "",
+    description: "",
   });
 
-  // IMAGE → BASE64
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const [image, setImage] = useState(null);
+  const [coords, setCoords] = useState(null);
 
+  // IMAGE
+  const handleImage = (e) => {
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-      setImageData(reader.result);
-    };
-    reader.readAsDataURL(file);
+    reader.onloadend = () => setImage(reader.result);
+    reader.readAsDataURL(e.target.files[0]);
   };
 
-  // REAL LOCATION
-  const getCurrentLocation = () => {
+  // GPS LOCATION
+  const captureLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported");
       return;
@@ -41,44 +45,38 @@ function UploadMaterial() {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
         });
-        alert("Location captured!");
+        alert("📍 Location captured successfully");
       },
-      () => alert("Failed to get location")
+      () => alert("Failed to capture location")
     );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const materialData = {
-      ...form,
-      image: imageData,
-      lat: coords?.lat || 19.045,
-      lng: coords?.lng || 72.889,
-    };
-
-    try {
-      await fetch("http://localhost:5000/api/materials", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(materialData),
-      });
-
-      alert("Material uploaded successfully!");
-    } catch {
-      alert("Upload failed");
+    if (!coords) {
+      alert("Please capture location before uploading");
+      return;
     }
 
-    setForm({
-      name: "",
-      category: "Metal",
-      quantity: "",
-      description: "",
-      location: "",
+    await fetch("http://localhost:5000/api/materials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        image,
+        lat: coords.lat,
+        lng: coords.lng,
+        uploadedBy: {
+          uid: user.uid,
+          name: user.name || user.email,
+          email: user.email,
+        },
+      }),
     });
-    setImagePreview(null);
-    setImageData(null);
-    setCoords(null);
+
+    alert("Material uploaded successfully");
+    navigate("/marketplace");
   };
 
   return (
@@ -86,87 +84,59 @@ function UploadMaterial() {
       <Navbar />
 
       <div className="upload-container">
-        <h2>Upload Waste Material</h2>
+        <h2>Upload Reusable Material</h2>
 
-        <form className="upload-form" onSubmit={handleSubmit}>
-          <label>
-            Material Name
-            <input
-              required
-              value={form.name}
-              onChange={(e) =>
-                setForm({ ...form, name: e.target.value })
-              }
-            />
-          </label>
+        <form onSubmit={handleSubmit} className="upload-form">
+          <input
+            placeholder="Material Name"
+            required
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
 
-          <label>
-            Category
-            <select
-              value={form.category}
-              onChange={(e) =>
-                setForm({ ...form, category: e.target.value })
-              }
-            >
-              <option>Metal</option>
-              <option>Plastic</option>
-              <option>Electronics</option>
-              <option>Chemical</option>
-              <option>Wood</option>
-            </select>
-          </label>
+          <select
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          >
+            <option>Metal</option>
+            <option>Plastic</option>
+            <option>Electronics</option>
+            <option>Chemical</option>
+            <option>Wood</option>
+          </select>
 
-          <label>
-            Quantity
-            <input
-              required
-              value={form.quantity}
-              onChange={(e) =>
-                setForm({ ...form, quantity: e.target.value })
-              }
-            />
-          </label>
+          <input
+            placeholder="Quantity"
+            required
+            onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+          />
 
-          <label>
-            Location
-            <input
-              required
-              placeholder="e.g. Mechanical Lab"
-              value={form.location}
-              onChange={(e) =>
-                setForm({ ...form, location: e.target.value })
-              }
-            />
-          </label>
+          <input
+            placeholder="Location name (e.g. Mechanical Lab)"
+            required
+            onChange={(e) => setForm({ ...form, location: e.target.value })}
+          />
 
           <button
             type="button"
             className="location-btn"
-            onClick={getCurrentLocation}
+            onClick={captureLocation}
           >
             📍 Use My Current Location
           </button>
 
-          <label>
-            Description
-            <textarea
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-            />
-          </label>
-
-          <label>
-            Upload Image
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-          </label>
-
-          {imagePreview && (
-            <div className="image-preview">
-              <img src={imagePreview} alt="Preview" />
-            </div>
+          {coords && (
+            <p className="location-status">
+              ✔ Location captured
+            </p>
           )}
+
+          <textarea
+            placeholder="Description"
+            onChange={(e) =>
+              setForm({ ...form, description: e.target.value })
+            }
+          />
+
+          <input type="file" accept="image/*" onChange={handleImage} />
 
           <button type="submit">Upload Material</button>
         </form>

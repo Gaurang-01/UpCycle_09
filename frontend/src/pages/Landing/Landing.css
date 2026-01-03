@@ -203,3 +203,186 @@ section h2 {
     transform: translateY(0);
   }
 }
+/* ========================= */
+/* 📱 MOBILE RESPONSIVENESS */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  /* HERO FIX */
+  .hero {
+    padding: 70px 16px;
+  }
+
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+  }
+
+  .hero-text h1 {
+    font-size: 34px;
+    line-height: 1.2;
+  }
+
+  .hero-text p {
+    font-size: 16px;
+    max-width: 100%;
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    margin-right: 0;
+    width: 100%;
+    max-width: 260px;
+  }
+
+  /* HERO IMAGE */
+  .hero-image img {
+    max-width: 280px;
+    animation: none;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 60px 16px;
+  }
+
+  section h2 {
+    font-size: 26px;
+  }
+
+  /* HOW IT WORKS */
+  .steps {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* AUDIENCE */
+  .audience-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .audience-card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* IMPACT */
+  .impact-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .impact-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .impact-card img {
+    width: 120px;
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    padding: 70px 16px;
+  }
+}
+/* =============================== */
+/* 📱 MOBILE CENTER ALIGN FIX */
+/* =============================== */
+
+@media (max-width: 768px) {
+
+  /* Center ALL section content */
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Hero text center */
+  .hero-text {
+    text-align: center;
+    align-items: center;
+  }
+
+  /* Paragraphs center */
+  .hero-text p,
+  .problem p {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  /* Headings center */
+  h1, h2, h3 {
+    text-align: center;
+  }
+
+  /* Buttons center */
+  .hero-actions {
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Fix cards alignment */
+  .steps,
+  .audience-grid,
+  .impact-cards {
+    align-items: center;
+  }
+
+  /* Cards fully centered */
+  .step-card,
+  .audience-card,
+  .impact-card {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Image center */
+  .hero-image {
+    display: flex;
+    justify-content: center;
+  }
+}
+/* Global content centering */
+.hero-content,
+.problem,
+.how-it-works,
+.audience,
+.impact-highlight,
+.final-cta {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  section {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

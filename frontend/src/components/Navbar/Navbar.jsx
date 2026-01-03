@@ -30,7 +30,7 @@ function Navbar() {
         <NavLink to="/map" className="nav-link" onClick={() => setOpen(false)}>Map</NavLink>
         <NavLink to="/impact" className="nav-link" onClick={() => setOpen(false)}>Impact</NavLink>
 
-        <NavLink to="/login" className="auth-link" onClick={() => setOpen(false)}>
+        <NavLink to="/auth" className="auth-link" onClick={() => setOpen(false)}>
           Login / Sign Up
         </NavLink>
       </div>

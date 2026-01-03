@@ -4,6 +4,7 @@ import Marketplace from "./pages/Marketplace/Marketplace";
 import UploadMaterial from "./pages/UploadMaterial/UploadMaterial";
 import Impact from "./pages/Impact/Impact";
 import Auth from "./pages/Auth/Auth";
+import Profile from "./pages/Profile/Profile";
 import MapView from "./pages/MapView/MapView";
 
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/upload" element={<UploadMaterial />} />
         <Route path="/impact" element={<Impact />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/map" element={<MapView />} />
 
       </Routes>

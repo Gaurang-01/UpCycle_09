@@ -1,27 +1,65 @@
 import Navbar from "../../components/Navbar/Navbar";
 import "./Landing.css";
-import recycle from "../../assets/recycle-logo.jpg"
-import innovation from "../../assets/kid-innovation.jpeg"
+
+// Assets
+import recycle from "../../assets/recycle-logo.jpg";
+import innovation from "../../assets/kid-innovation.jpeg";
 import listWasteImg from "../../assets/list.jpeg";
 import CO2 from "../../assets/CarbonFootprint.jpg";
 import trackimpact from "../../assets/track impact.jpeg";
 import recycleworker from "../../assets/recycling_worker.jpeg";
 import Request from "../../assets/request.jpeg";
 
-
 function Landing() {
+  const steps = [
+    {
+      img: listWasteImg,
+      title: "List Waste",
+      desc:
+        "Labs and industries upload surplus materials with photos, quantity, and location.",
+    },
+    {
+      img: Request,
+      title: "Discover & Request",
+      desc:
+        "Students explore available materials and request what they need for projects.",
+    },
+    {
+      img: trackimpact,
+      title: "Track Impact",
+      desc:
+        "Every exchange updates live sustainability and impact metrics.",
+    },
+  ];
+
+  const impacts = [
+    {
+      img: recycleworker,
+      title: "Waste Reduction",
+      desc: "Materials diverted from landfills.",
+    },
+    {
+      img: CO2,
+      title: "Lower Carbon Footprint",
+      desc: "Reduced emissions through reuse.",
+    },
+    {
+      img: innovation,
+      title: "Innovation Enablement",
+      desc: "Lower barriers for student innovation.",
+    },
+  ];
 
   return (
     <>
       <Navbar />
 
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
             <h1>
-              Turning <span>Campus Waste</span> into{" "}
-              <span>Innovation</span>
+              Turning <span>Campus Waste</span> into <span>Innovation</span>
             </h1>
 
             <p>
@@ -40,11 +78,11 @@ function Landing() {
             </div>
           </div>
 
-          {/* HERO IMAGE */}
           <div className="hero-image">
             <img
               src={recycle}
               alt="Sustainable Innovation"
+              loading="lazy"
             />
           </div>
         </div>
@@ -66,41 +104,13 @@ function Landing() {
         <h2>How UpCycle Connect Works</h2>
 
         <div className="steps">
-          <div className="step-card">
-            <img
-              src={listWasteImg}
-              alt="Upload"
-            />
-            <h3>List Waste</h3>
-            <p>
-              Labs and industries upload surplus materials with photos,
-              quantity, and location.
-            </p>
-          </div>
-
-          <div className="step-card">
-            <img
-              src={Request}
-              alt="Discover"
-            />
-            <h3>Discover & Request</h3>
-            <p>
-              Students explore available materials and request what they
-              need for projects.
-            </p>
-          </div>
-
-          <div className="step-card">
-            <img
-              src={trackimpact}
-              alt="Impact"
-            />
-            <h3>Track Impact</h3>
-            <p>
-              Every exchange updates live sustainability and impact
-              metrics.
-            </p>
-          </div>
+          {steps.map((step, index) => (
+            <div className="step-card" key={index}>
+              <img src={step.img} alt={step.title} loading="lazy" />
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -127,9 +137,7 @@ function Landing() {
 
           <div className="audience-card">
             <h3>Startups & Recyclers</h3>
-            <p>
-              Discover reusable resources and lower sourcing costs.
-            </p>
+            <p>Discover reusable resources and lower sourcing costs.</p>
           </div>
         </div>
       </section>
@@ -139,36 +147,17 @@ function Landing() {
         <h2>Why It Matters</h2>
 
         <div className="impact-cards">
-          <div className="impact-card">
-            <img
-              src={recycleworker}
-              alt="Recycle"
-            />
-            <h3>Waste Reduction</h3>
-            <p>Materials diverted from landfills.</p>
-          </div>
-
-          <div className="impact-card">
-            <img
-              src={CO2}
-              alt="CO2"
-            />
-            <h3>Lower Carbon Footprint</h3>
-            <p>Reduced emissions through reuse.</p>
-          </div>
-
-          <div className="impact-card">
-            <img
-              src={innovation}
-              alt="Innovation"
-            />
-            <h3>Innovation Enablement</h3>
-            <p>Lower barriers for student innovation.</p>
-          </div>
+          {impacts.map((item, index) => (
+            <div className="impact-card" key={index}>
+              <img src={item.img} alt={item.title} loading="lazy" />
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* CTA */}
       <section className="final-cta">
         <h2>Start Reusing. Start Building.</h2>
         <a href="/marketplace" className="primary-btn">

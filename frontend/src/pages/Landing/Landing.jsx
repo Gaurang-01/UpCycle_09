@@ -2,7 +2,15 @@ import Navbar from "../../components/Navbar/Navbar";
 import "./Landing.css";
 import recycle from "../../assets/recycle-logo.jpg"
 import innovation from "../../assets/kid-innovation.jpeg"
+import listWasteImg from "../../assets/list.jpeg";
+import CO2 from "../../assets/CarbonFootprint.jpg";
+import trackimpact from "../../assets/track impact.jpeg";
+import recycleworker from "../../assets/recycling_worker.jpeg";
+import Request from "../../assets/request.jpeg";
+
+
 function Landing() {
+
   return (
     <>
       <Navbar />
@@ -60,7 +68,7 @@ function Landing() {
         <div className="steps">
           <div className="step-card">
             <img
-              src="https://illustrations.popsy.co/green/uploading.svg"
+              src={listWasteImg}
               alt="Upload"
             />
             <h3>List Waste</h3>
@@ -72,7 +80,7 @@ function Landing() {
 
           <div className="step-card">
             <img
-              src="https://illustrations.popsy.co/green/searching.svg"
+              src={Request}
               alt="Discover"
             />
             <h3>Discover & Request</h3>
@@ -84,7 +92,7 @@ function Landing() {
 
           <div className="step-card">
             <img
-              src="https://illustrations.popsy.co/green/analytics.svg"
+              src={trackimpact}
               alt="Impact"
             />
             <h3>Track Impact</h3>
@@ -133,7 +141,7 @@ function Landing() {
         <div className="impact-cards">
           <div className="impact-card">
             <img
-              src="https://illustrations.popsy.co/green/recycle.svg"
+              src={recycleworker}
               alt="Recycle"
             />
             <h3>Waste Reduction</h3>
@@ -142,7 +150,7 @@ function Landing() {
 
           <div className="impact-card">
             <img
-              src="https://illustrations.popsy.co/green/eco.svg"
+              src={CO2}
               alt="CO2"
             />
             <h3>Lower Carbon Footprint</h3>

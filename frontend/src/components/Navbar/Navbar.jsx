@@ -4,7 +4,7 @@ import "./Navbar.css";
 function Navbar() {
   return (
     <nav className="navbar">
-      {/* LOGO / BRAND */}
+      {/* LOGO */}
       <div className="nav-logo">
         <NavLink to="/">UpCycle Connect</NavLink>
       </div>
@@ -20,6 +20,8 @@ function Navbar() {
           Marketplace
         </NavLink>
 
+        
+
         <NavLink
           to="/upload"
           className={({ isActive }) =>
@@ -28,6 +30,15 @@ function Navbar() {
         >
           Upload
         </NavLink>
+        <NavLink
+          to="/map"
+          className={({ isActive }) =>
+            isActive ? "nav-link active" : "nav-link"
+          }
+        >
+          Map
+        </NavLink>
+
 
         <NavLink
           to="/impact"
@@ -36,6 +47,11 @@ function Navbar() {
           }
         >
           Impact
+        </NavLink>
+
+        {/* AUTH CTA */}
+        <NavLink to="/auth" className="auth-link">
+          Login / Sign Up
         </NavLink>
       </div>
     </nav>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { collection, addDoc } from "firebase/firestore"; // Import Firestore
+import { db } from "../../firebase"; // Import db instance
 import Navbar from "../../components/Navbar/Navbar";
 import "./RequestMaterial.css";
 
@@ -24,21 +26,27 @@ function RequestMaterial() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:5000/api/general-requests", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        requestedBy: {
-          uid: user.uid,
-          name: user.name || user.email,
-          email: user.email,
-        },
-      }),
-    });
+    if (!user) return;
 
-    alert("Request submitted successfully");
-    navigate("/marketplace");
+    try {
+      // Save to Firestore "market_requests" collection
+      await addDoc(collection(db, "market_requests"), {
+        ...form,
+        requesterId: user.uid,
+        requesterName: user.name || user.email,
+        requesterEmail: user.email,
+        createdAt: new Date(),
+        status: "open", // open request
+        type: "general_request"
+      });
+
+      alert("Request submitted successfully! It is now visible in the Marketplace.");
+      navigate("/marketplace");
+      
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      alert("Failed to submit request.");
+    }
   };
 
   return (
@@ -46,7 +54,8 @@ function RequestMaterial() {
       <Navbar />
 
       <div className="request-container">
-        <h2>Request Material</h2>
+        <h2>Post a Requirement</h2>
+        <p className="sub-text">Can't find what you need? Post a request here.</p>
 
         <form className="request-form" onSubmit={handleSubmit}>
           <input
@@ -70,7 +79,7 @@ function RequestMaterial() {
           </select>
 
           <input
-            placeholder="Required quantity"
+            placeholder="Required quantity (e.g., 50kg)"
             required
             onChange={(e) =>
               setForm({ ...form, quantity: e.target.value })
@@ -78,7 +87,8 @@ function RequestMaterial() {
           />
 
           <textarea
-            placeholder="Describe your requirement / use-case"
+            placeholder="Describe your requirement / use-case..."
+            rows="4"
             onChange={(e) =>
               setForm({ ...form, message: e.target.value })
             }

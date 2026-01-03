@@ -7,7 +7,7 @@ import Auth from "./pages/Auth/Auth";
 import Profile from "./pages/Profile/Profile";
 import MapView from "./pages/MapView/MapView";
 import RequestMaterial from "./pages/RequestMaterial/RequestMaterial";
-
+import SupplierInventory from "./pages/SupplierInventory/SupplierInventory";
 
 
 
@@ -23,6 +23,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/request" element={<RequestMaterial />} />
+        <Route path="/inventory" element={<SupplierInventory />} />
 
 
       </Routes>

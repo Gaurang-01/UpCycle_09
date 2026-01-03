@@ -24,12 +24,18 @@ function UploadMaterial() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // NOTE: This creates a local URL. For production, use Firebase Storage.
+      // But for this hackathon, this works on your local machine only.
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   /* GPS */
   const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
@@ -37,24 +43,22 @@ function UploadMaterial() {
 
         setCoords({ lat, lng });
 
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
-        );
-        const data = await res.json();
-
-        setForm({
-          ...form,
-          location:
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+          );
+          const data = await res.json();
+          const loc =
             data.address.suburb ||
             data.address.city ||
-            data.display_name,
-        });
+            data.display_name;
 
-        setQuery(
-          data.address.suburb ||
-            data.address.city ||
-            "Current Location"
-        );
+          setForm({ ...form, location: loc });
+          setQuery(loc);
+          setSuggestions([]);
+        } catch (err) {
+          console.error("Geocoding error: ", err);
+        }
       },
       () => alert("Location access denied")
     );
@@ -63,18 +67,22 @@ function UploadMaterial() {
   /* SEARCH (INDIA ONLY) */
   const searchLocation = async (value) => {
     setQuery(value);
+    setForm({ ...form, location: value });
 
     if (value.length < 3) {
       setSuggestions([]);
       return;
     }
 
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&addressdetails=1&limit=5&q=${value}`
-    );
-    const data = await res.json();
-
-    setSuggestions(data);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&addressdetails=1&limit=5&q=${value}`
+      );
+      const data = await res.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.log("Search error", error);
+    }
   };
 
   const selectLocation = (place) => {
@@ -83,54 +91,84 @@ function UploadMaterial() {
       place.address.town ||
       place.address.village ||
       "";
-
     const state = place.address.state || "";
+    const loc = `${place.name || city}, ${state}`;
 
-    setForm({
-      ...form,
-      location: `${place.name || city}, ${state}`,
-    });
-
+    setForm({ ...form, location: loc });
     setCoords({
       lat: Number(place.lat),
       lng: Number(place.lon),
     });
-
-    setQuery(`${place.name || city}, ${state}`);
+    setQuery(loc);
     setSuggestions([]);
+  };
+
+  /* GEOCODE MANUAL LOCATION (ON SUBMIT) */
+  const geocodeLocation = async (text) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&limit=1&q=${text}`
+      );
+      const data = await res.json();
+      if (data.length === 0) return null;
+      return {
+        lat: Number(data[0].lat),
+        lng: Number(data[0].lon),
+      };
+    } catch (e) {
+      return null;
+    }
   };
 
   /* SUBMIT */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!coords) {
-      alert("Please select a location");
+    if (!user) {
+      alert("You must be logged in to upload material!");
       return;
     }
 
-    await addDoc(collection(db, "materials"), {
-      ...form,
-      image: imagePreview,
-      lat: coords.lat,
-      lng: coords.lng,
-      supplierId: user.uid,
-      supplierName: user.name || user.email,
-      createdAt: new Date(),
-    });
+    let finalCoords = coords;
 
-    alert("Material uploaded");
+    // If user typed location but didn't select suggestion
+    if (!finalCoords) {
+      const geo = await geocodeLocation(form.location);
+      if (!geo) {
+        alert("Unable to locate the entered address");
+        return;
+      }
+      finalCoords = geo;
+    }
 
-    setForm({
-      name: "",
-      category: "Metal",
-      quantity: "",
-      description: "",
-      location: "",
-    });
-    setCoords(null);
-    setImagePreview(null);
-    setQuery("");
+    try {
+      await addDoc(collection(db, "materials"), {
+        ...form,
+        image: imagePreview, // Warning: Local blob URL
+        lat: finalCoords.lat,
+        lng: finalCoords.lng,
+        supplierId: user.uid,
+        supplierName: user.name || user.email,
+        createdAt: new Date(),
+      });
+
+      alert("Material uploaded successfully");
+
+      setForm({
+        name: "",
+        category: "Metal",
+        quantity: "",
+        description: "",
+        location: "",
+      });
+      setCoords(null);
+      setImagePreview(null);
+      setQuery("");
+      setSuggestions([]);
+    } catch (error) {
+      console.error("Error uploading document: ", error);
+      alert("Error uploading material. Check console.");
+    }
   };
 
   return (

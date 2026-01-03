@@ -1,0 +1,205 @@
+/* HERO */
+.hero {
+  padding: 100px 20px;
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+}
+
+.hero-content {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-text h1 {
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.hero-text span {
+  color: #15803d;
+}
+
+.hero-text p {
+  margin-top: 20px;
+  color: #4b5563;
+  font-size: 18px;
+  max-width: 600px;
+}
+
+.hero-actions {
+  margin-top: 30px;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 12px 26px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.primary-btn {
+  background: #15803d;
+  color: white;
+}
+
+.secondary-btn {
+  border: 2px solid #15803d;
+  color: #15803d;
+}
+
+/* HERO IMAGE */
+.hero-image {
+  flex: 1;
+  border-radius: 1px;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 420px;
+  animation: float 4s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+/* SECTIONS */
+section {
+  padding: 70px 20px;
+  text-align: center;
+}
+
+section h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: #166534;
+}
+
+/* PROBLEM */
+.problem p {
+  max-width: 700px;
+  margin: auto;
+  color: #374151;
+}
+
+/* HOW IT WORKS */
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.step-card {
+  background: white;
+  padding: 24px;
+  width: 260px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step-card img {
+  width: 60px;
+  margin-bottom: 12px;
+}
+
+.step-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* AUDIENCE */
+.audience-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.audience-card {
+  background: #f9fafb;
+  padding: 24px;
+  width: 260px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.audience-card:hover {
+  transform: translateY(-6px);
+}
+
+/* IMPACT */
+.impact-highlight {
+  background: #f0fdf4;
+}
+
+.impact-cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.impact-card {
+  background: white;
+  padding: 24px;
+  width: 260px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.impact-card img {
+  width: 60px;
+  margin-bottom: 12px;
+}
+
+.impact-card:hover {
+  transform: translateY(-6px);
+}
+
+/* FINAL CTA */
+.final-cta {
+  background: #166534;
+  color: white;
+}
+
+.final-cta h2 {
+  color: white;
+}
+
+.final-cta .primary-btn {
+  background: white;
+  color: #166534;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

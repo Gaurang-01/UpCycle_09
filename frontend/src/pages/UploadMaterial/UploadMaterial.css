@@ -1,0 +1,59 @@
+.upload-container {
+  padding: 40px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.upload-container h2 {
+  margin-bottom: 20px;
+  color: #166534;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upload-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #374151;
+}
+
+.upload-form input,
+.upload-form select,
+.upload-form textarea {
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.upload-form button {
+  margin-top: 10px;
+  padding: 12px;
+  background: #15803d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.upload-form button:hover {
+  background: #166534;
+}
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 6px;
+  border: 1px solid #d1d5db;
+}
+

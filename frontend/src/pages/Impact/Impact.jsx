@@ -1,14 +1,26 @@
-import { useContext } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import { MaterialContext } from "../../context/MaterialContext";
 import "./Impact.css";
 
 function Impact() {
-  const { materials } = useContext(MaterialContext);
+  const [materials, setMaterials] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/materials")
+      .then((res) => res.json())
+      .then((data) => setMaterials(data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const totalMaterials = materials.length;
   const estimatedWasteSaved = totalMaterials * 5; // kg (mock logic)
-  const estimatedCO2 = totalMaterials * 2.3; // kg CO₂ (mock)
+  const estimatedCO2 = (totalMaterials * 2.3).toFixed(1); // kg CO₂
+
+  // category count
+  const categoryCount = materials.reduce((acc, item) => {
+    acc[item.category] = (acc[item.category] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <>
@@ -57,11 +69,15 @@ function Impact() {
           <h3>Material Categories</h3>
 
           <div className="category-list">
-            <span>Metal</span>
-            <span>Plastic</span>
-            <span>Electronics</span>
-            <span>Chemical</span>
-            <span>Wood</span>
+            {Object.keys(categoryCount).length === 0 && (
+              <span>No data yet</span>
+            )}
+
+            {Object.keys(categoryCount).map((cat) => (
+              <span key={cat}>
+                {cat} ({categoryCount[cat]})
+              </span>
+            ))}
           </div>
         </div>
 
@@ -70,7 +86,11 @@ function Impact() {
           <h3>Recent Activity</h3>
 
           <ul className="activity-feed">
-            {materials.slice(-5).map((item) => (
+            {materials.length === 0 && (
+              <li>No activity yet</li>
+            )}
+
+            {materials.slice(-5).reverse().map((item) => (
               <li key={item.id}>
                 ♻️ <strong>{item.name}</strong> reused from{" "}
                 {item.location}

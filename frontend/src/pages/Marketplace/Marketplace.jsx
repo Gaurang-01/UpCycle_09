@@ -1,28 +1,24 @@
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
-import { MaterialContext } from "../../context/MaterialContext";
 import "./Marketplace.css";
 
 function Marketplace() {
-  const { materials } = useContext(MaterialContext);
-
+  const [materials, setMaterials] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [location, setLocation] = useState("All");
+  const navigate = useNavigate();
 
-  // FILTER LOGIC
-  const filteredMaterials = materials.filter((item) => {
-    const matchesSearch = item.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
+  useEffect(() => {
+    fetch("http://localhost:5000/api/materials")
+      .then((res) => res.json())
+      .then((data) => setMaterials(data));
+  }, []);
 
-    const matchesCategory =
-      category === "All" || item.category === category;
-
-    const matchesLocation =
-      location === "All" || item.location === location;
-
-    return matchesSearch && matchesCategory && matchesLocation;
+  const filtered = materials.filter((m) => {
+    const matchName = m.name.toLowerCase().includes(search.toLowerCase());
+    const matchCat = category === "All" || m.category === category;
+    return matchName && matchCat;
   });
 
   return (
@@ -30,68 +26,57 @@ function Marketplace() {
       <Navbar />
 
       <div className="marketplace">
-        {/* LEFT: MAP PLACEHOLDER */}
-        <div className="map-section">
-          <p>📍 Campus Map View</p>
-          <span>(Location-based discovery coming soon)</span>
+        <h2>Available Materials</h2>
+
+        {/* SEARCH & FILTER */}
+        <div className="marketplace-controls">
+          <input
+            placeholder="Search materials..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="All">All Categories</option>
+            <option>Metal</option>
+            <option>Plastic</option>
+            <option>Electronics</option>
+            <option>Chemical</option>
+            <option>Wood</option>
+          </select>
         </div>
 
-        {/* RIGHT: MATERIAL LIST */}
-        <div className="materials-section">
-          <h2>Available Materials</h2>
-
-          {/* SEARCH + FILTER BAR */}
-          <div className="filter-bar">
-            <input
-              type="text"
-              placeholder="Search materials..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="All">All Categories</option>
-              <option value="Metal">Metal</option>
-              <option value="Plastic">Plastic</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Chemical">Chemical</option>
-              <option value="Wood">Wood</option>
-            </select>
-
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            >
-              <option value="All">All Locations</option>
-              <option value="Mechanical Lab">Mechanical Lab</option>
-              <option value="Chemistry Lab">Chemistry Lab</option>
-              <option value="Electronics Lab">Electronics Lab</option>
-              <option value="Uploaded by Lab">Uploaded by Lab</option>
-            </select>
-          </div>
-
-          {/* MATERIAL CARDS */}
-          {filteredMaterials.length === 0 && (
-            <p className="no-results">No materials found.</p>
-          )}
-
-          {filteredMaterials.map((item) => (
+        <div className="materials-grid">
+          {filtered.map((item) => (
             <div className="material-card" key={item.id}>
-              {item.image && <img src={item.image} alt="" />}
+              <div className="material-image-wrapper">
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="material-image"
+                  />
+                ) : (
+                  <div className="material-image placeholder">
+                    No Image
+                  </div>
+                )}
+              </div>
 
               <h3>{item.name}</h3>
+              <p><strong>Category:</strong> {item.category}</p>
+              <p><strong>Quantity:</strong> {item.quantity}</p>
 
-              <p>
-                <strong>Category:</strong> {item.category}
-              </p>
-              <p>
-                <strong>Quantity:</strong> {item.quantity}
-              </p>
-              <p>
-                <strong>Location:</strong> {item.location}
+              <p
+                className="location-link"
+                onClick={() =>
+                  navigate(`/map?materialId=${item.id}`)
+                }
+              >
+                📍 {item.location}
               </p>
 
               <button className="request-btn">

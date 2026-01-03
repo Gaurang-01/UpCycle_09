@@ -1,64 +1,25 @@
 .map-page {
   padding: 40px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: auto;
 }
 
-.map-header {
+.map-page h2 {
   text-align: center;
-  margin-bottom: 30px;
-}
-
-.map-header h2 {
   color: #166534;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.map-header p {
+.map-page p {
+  text-align: center;
   color: #4b5563;
+  margin-bottom: 20px;
 }
 
 /* MAP */
 .map-container {
-  height: 420px;
+  height: 500px;
+  width: 100%;
   border-radius: 16px;
-  border: 2px dashed #22c55e;
-  background: #ecfdf5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.map-placeholder {
-  font-size: 20px;
-  color: #15803d;
-}
-
-/* LEGEND */
-.map-legend {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin-top: 20px;
-  font-weight: 500;
-}
-
-.dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.dot.metal {
-  background: #64748b;
-}
-
-.dot.plastic {
-  background: #0ea5e9;
-}
-
-.dot.electronics {
-  background: #a855f7;
+  border: 2px solid #bbf7d0;
 }

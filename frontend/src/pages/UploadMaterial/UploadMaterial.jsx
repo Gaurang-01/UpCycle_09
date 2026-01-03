@@ -1,44 +1,84 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import { MaterialContext } from "../../context/MaterialContext";
 import "./UploadMaterial.css";
 
 function UploadMaterial() {
-  const { addMaterial } = useContext(MaterialContext);
-
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageData, setImageData] = useState(null);
+  const [coords, setCoords] = useState(null);
+
   const [form, setForm] = useState({
     name: "",
     category: "Metal",
     quantity: "",
     description: "",
+    location: "",
   });
 
+  // IMAGE → BASE64
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setImageData(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  // REAL LOCATION
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        alert("Location captured!");
+      },
+      () => alert("Failed to get location")
+    );
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    addMaterial({
+    const materialData = {
       ...form,
-      location: "Uploaded by Lab",
-      image: imagePreview,
-    });
+      image: imageData,
+      lat: coords?.lat || 19.045,
+      lng: coords?.lng || 72.889,
+    };
 
-    alert("Material uploaded!");
+    try {
+      await fetch("http://localhost:5000/api/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(materialData),
+      });
+
+      alert("Material uploaded successfully!");
+    } catch {
+      alert("Upload failed");
+    }
 
     setForm({
       name: "",
       category: "Metal",
       quantity: "",
       description: "",
+      location: "",
     });
     setImagePreview(null);
+    setImageData(null);
+    setCoords(null);
   };
 
   return (
@@ -52,8 +92,7 @@ function UploadMaterial() {
           <label>
             Material Name
             <input
-              type="text"
-              placeholder="e.g. Copper Wire"
+              required
               value={form.name}
               onChange={(e) =>
                 setForm({ ...form, name: e.target.value })
@@ -80,8 +119,7 @@ function UploadMaterial() {
           <label>
             Quantity
             <input
-              type="text"
-              placeholder="e.g. 5 kg / 10 units"
+              required
               value={form.quantity}
               onChange={(e) =>
                 setForm({ ...form, quantity: e.target.value })
@@ -90,9 +128,28 @@ function UploadMaterial() {
           </label>
 
           <label>
+            Location
+            <input
+              required
+              placeholder="e.g. Mechanical Lab"
+              value={form.location}
+              onChange={(e) =>
+                setForm({ ...form, location: e.target.value })
+              }
+            />
+          </label>
+
+          <button
+            type="button"
+            className="location-btn"
+            onClick={getCurrentLocation}
+          >
+            📍 Use My Current Location
+          </button>
+
+          <label>
             Description
             <textarea
-              placeholder="Any extra details..."
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
@@ -102,17 +159,12 @@ function UploadMaterial() {
 
           <label>
             Upload Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
+            <input type="file" accept="image/*" onChange={handleImageChange} />
           </label>
 
           {imagePreview && (
             <div className="image-preview">
-              <p>Preview:</p>
-              <img src={imagePreview} alt="Material Preview" />
+              <img src={imagePreview} alt="Preview" />
             </div>
           )}
 

@@ -150,14 +150,14 @@ section h2 {
 .impact-card {
   background: white;
   padding: 24px;
-  width: 260px;
+  width: 200px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   transition: transform 0.3s ease;
 }
 
 .impact-card img {
-  width: 100px;
+  width: 150px;
   margin-bottom: 12px;
 }
 

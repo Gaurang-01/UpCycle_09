@@ -42,3 +42,16 @@
   color: #15803d;
   border-bottom: 2px solid #15803d;
 }
+.auth-link {
+  margin-left: 20px;
+  padding: 8px 16px;
+  background: #15803d;
+  color: white !important;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-link:hover {
+  background: #166534;
+}

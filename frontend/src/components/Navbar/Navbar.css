@@ -1,108 +1,191 @@
-/* RESET OVERFLOW ISSUE */
-body {
-  overflow-x: hidden;
-}
-
-/* NAVBAR */
+/* --- GLOBAL NAVBAR STYLES --- */
 .navbar {
-  height: 64px;
-  padding: 0 16px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
   top: 0;
-  z-index: 100;
   width: 100%;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  z-index: 1000;
+  height: 70px; /* Fixed height to prevent layout shifts */
+  box-sizing: border-box;
 }
 
-/* LOGO */
+/* --- LOGO --- */
 .nav-logo a {
-  font-size: 20px;
-  font-weight: 700;
-  color: #166534;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #27ae60; /* Brand Green */
   text-decoration: none;
 }
 
-/* LINKS (DESKTOP) */
+/* --- LINKS CONTAINER (DESKTOP) --- */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
+  list-style: none;
 }
 
-/* LINK STYLE */
 .nav-link {
   text-decoration: none;
-  color: #374151;
+  color: #333;
   font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s ease;
 }
 
-.nav-link:hover {
-  color: #107134;
-}
-
+.nav-link:hover,
 .nav-link.active {
-  color: #15803d;
-  border-bottom: 2px solid #15803d;
+  color: #27ae60;
 }
 
-/* AUTH BUTTON */
+/* --- AUTH BUTTON (Login/Signup) --- */
 .auth-link {
-  padding: 8px 16px;
-  background: #15803d;
-  color: white !important;
-  border-radius: 8px;
   text-decoration: none;
+  background-color: #27ae60;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 25px;
   font-weight: 600;
+  transition: background 0.3s ease;
 }
 
-/* HAMBURGER */
+.auth-link:hover {
+  background-color: #1e8449;
+}
+
+/* --- AUTH SECTION (Logged In User) --- */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 10px;
+  border-left: 2px solid #eee; /* Visual separator */
+  padding-left: 15px;
+}
+
+.user-email {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap; /* Prevents email from breaking lines */
+}
+
+.btn-logout {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.btn-logout:hover {
+  background-color: #c0392b;
+}
+
+/* --- HAMBURGER MENU (MOBILE TRIGGER) --- */
 .hamburger {
-  display: none;
+  display: none; /* Hidden by default on desktop */
   flex-direction: column;
   cursor: pointer;
+  gap: 5px;
 }
 
 .hamburger span {
+  width: 25px;
   height: 3px;
-  width: 24px;
-  background: #166534;
-  margin: 4px 0;
-  transition: 0.3s;
+  background-color: #333;
+  border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
-/* MOBILE VIEW */
-@media (max-width: 768px) {
-  .hamburger {
-    display: flex;
+/* --- MOBILE RESPONSIVENESS --- */
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
   }
 
+  .hamburger {
+    display: flex;
+    z-index: 1001; /* Above the slide-out menu */
+  }
+
+  /* Hamburger Animation to X */
+  .hamburger.open span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -6px);
+  }
+
+  /* Mobile Links Menu */
   .nav-links {
-    position: absolute;
-    top: 64px;
-    left: 0;
-    width: 100%;
-    background: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 70%;
+    background-color: #fff;
     flex-direction: column;
+    justify-content: center; /* Center items vertically */
     align-items: center;
-    gap: 16px;
-    padding: 20px 0;
-    transform: translateY(-200%);
+    gap: 30px;
+    transform: translateX(100%); /* Hide off-screen */
     transition: transform 0.3s ease-in-out;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 999;
   }
 
   .nav-links.active {
-    transform: translateY(0);
+    transform: translateX(0%); /* Slide in */
   }
 
-  .nav-link,
-  .auth-link {
-    width: 90%;
-    text-align: center;
+  /* Reset Auth Section Styles for Mobile */
+  .auth-section {
+    flex-direction: column;
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    gap: 20px;
+  }
+
+  .user-email {
+    font-size: 1.1rem;
+  }
+}
+/* Add this to the bottom of Navbar.css */
+
+.user-profile-link {
+  text-decoration: none;
+  font-weight: 700;
+  color: #2c3e50; /* Dark Blue/Grey */
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent; /* Invisible underline by default */
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.user-profile-link:hover {
+  color: #27ae60; /* Green on hover */
+  border-bottom: 2px solid #27ae60; /* Green underline on hover */
+}
+
+/* Mobile Fix */
+@media screen and (max-width: 768px) {
+  .user-profile-link {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
   }
 }

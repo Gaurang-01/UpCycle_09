@@ -1,9 +1,31 @@
-import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom"; // Added 'Link'
+import { useState, useEffect } from "react";
+import { auth } from "../../firebase"; 
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import "./Navbar.css";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null); 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe(); 
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setOpen(false); 
+      localStorage.removeItem("user"); 
+      navigate("/"); 
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
 
   return (
     <nav className="navbar">
@@ -30,9 +52,23 @@ function Navbar() {
         <NavLink to="/map" className="nav-link" onClick={() => setOpen(false)}>Map</NavLink>
         <NavLink to="/impact" className="nav-link" onClick={() => setOpen(false)}>Impact</NavLink>
 
-        <NavLink to="/auth" className="auth-link" onClick={() => setOpen(false)}>
-          Login / Sign Up
-        </NavLink>
+        {/* AUTH CHECK */}
+        {user ? (
+          <div className="auth-section">
+            {/* 👇 THIS IS THE FIX: Clickable Link to Profile */}
+            <Link to="/profile" className="user-profile-link" onClick={() => setOpen(false)}>
+                Hi, {user.email?.split('@')[0]}
+            </Link>
+            
+            <button className="btn-logout" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <NavLink to="/auth" className="auth-link" onClick={() => setOpen(false)}>
+            Login / Sign Up
+          </NavLink>
+        )}
       </div>
     </nav>
   );

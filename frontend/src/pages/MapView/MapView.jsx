@@ -1,93 +1,54 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-} from "react-leaflet";
+import { useLocation, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 import Navbar from "../../components/Navbar/Navbar";
-import "../../utils/leafletIconFix";
-import "./MapView.css";
 
-/* ---------------------------------
-   Handles zoom + focus on selection
----------------------------------- */
-function FlyToLocation({ position }) {
-  const map = useMap();
+// Fix for default marker icon in React Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-  useEffect(() => {
-    if (position) {
-      map.flyTo(position, 18, {
-        duration: 1.5,
-      });
-    }
-  }, [position, map]);
-
-  return null;
-}
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 function MapView() {
-  const [materials, setMaterials] = useState([]);
-  const [searchParams] = useSearchParams();
-  const selectedId = searchParams.get("materialId");
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/materials")
-      .then((res) => res.json())
-      .then((data) => setMaterials(data));
-  }, []);
-
-  const selected = materials.find(
-    (m) => String(m.id) === String(selectedId)
-  );
-
-  const defaultCenter = [19.0449, 72.8891];
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Get coordinates passed from Marketplace
+  // Default to a fallback location (e.g., New York) if no data
+  const { lat, lng, title } = location.state || { lat: 40.7128, lng: -74.0060, title: "Default Location" };
 
   return (
     <>
       <Navbar />
-
-      <div className="map-page">
-        <h2>Material Locations</h2>
-
-        <MapContainer
-          center={
-            selected
-              ? [selected.lat, selected.lng]
-              : defaultCenter
-          }
-          zoom={16}
-          className="map-container"
+      <div style={{ paddingTop: "80px", textAlign: "center" }}>
+        <h2>📍 Location: {title}</h2>
+        <button 
+            onClick={() => navigate(-1)} 
+            style={{marginBottom: '20px', padding: '10px', cursor: 'pointer'}}
         >
-          <TileLayer
-            attribution="&copy; OpenStreetMap contributors"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+            ← Back to Marketplace
+        </button>
 
-          {/* Smooth zoom when location is selected */}
-          {selected && (
-            <FlyToLocation
-              position={[selected.lat, selected.lng]}
+        <div style={{ height: "500px", width: "90%", margin: "0 auto", border: "2px solid #ddd" }}>
+          <MapContainer center={[lat, lng]} zoom={15} scrollWheelZoom={true} style={{ height: "100%", width: "100%" }}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          )}
-
-          {materials.map((item) => (
-            <Marker
-              key={item.id}
-              position={[item.lat, item.lng]}
-            >
+            <Marker position={[lat, lng]}>
               <Popup>
-                <strong>{item.name}</strong>
-                <br />
-                📍 {item.location}
-                <br />
-                👤 {item.uploadedBy?.name}
+                {title} <br /> Item Location.
               </Popup>
             </Marker>
-          ))}
-        </MapContainer>
+          </MapContainer>
+        </div>
       </div>
     </>
   );

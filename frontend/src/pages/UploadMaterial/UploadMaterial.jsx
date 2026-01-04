@@ -24,13 +24,11 @@ function UploadMaterial() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // NOTE: This creates a local URL. For production, use Firebase Storage.
-      // But for this hackathon, this works on your local machine only.
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  /* GPS */
+  /* GPS - Use Browser Location */
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -43,6 +41,7 @@ function UploadMaterial() {
 
         setCoords({ lat, lng });
 
+        // Reverse Geocode (Get address name from coords)
         try {
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
@@ -60,7 +59,7 @@ function UploadMaterial() {
           console.error("Geocoding error: ", err);
         }
       },
-      () => alert("Location access denied")
+      () => alert("Location access denied. Please allow location access in your browser.")
     );
   };
 
@@ -131,11 +130,11 @@ function UploadMaterial() {
 
     let finalCoords = coords;
 
-    // If user typed location but didn't select suggestion
+    // If user typed location but didn't select suggestion, try to find coords now
     if (!finalCoords) {
       const geo = await geocodeLocation(form.location);
       if (!geo) {
-        alert("Unable to locate the entered address");
+        alert("Unable to find coordinates for this address. Please use the 'Current Location' button or select from the dropdown.");
         return;
       }
       finalCoords = geo;
@@ -144,7 +143,7 @@ function UploadMaterial() {
     try {
       await addDoc(collection(db, "materials"), {
         ...form,
-        image: imagePreview, // Warning: Local blob URL
+        image: imagePreview,
         lat: finalCoords.lat,
         lng: finalCoords.lng,
         supplierId: user.uid,
@@ -152,8 +151,7 @@ function UploadMaterial() {
         createdAt: new Date(),
       });
 
-      alert("Material uploaded successfully");
-
+      alert("Material uploaded successfully!");
       setForm({
         name: "",
         category: "Metal",
@@ -174,7 +172,6 @@ function UploadMaterial() {
   return (
     <>
       <Navbar />
-
       <div className="upload-page">
         <div className="upload-card">
           <h2>Upload Waste Material</h2>
@@ -183,21 +180,14 @@ function UploadMaterial() {
             <input
               placeholder="Material Name"
               value={form.name}
-              onChange={(e) =>
-                setForm({ ...form, name: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
 
             <div className="row">
               <select
                 value={form.category}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    category: e.target.value,
-                  })
-                }
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
                 <option>Metal</option>
                 <option>Plastic</option>
@@ -209,12 +199,7 @@ function UploadMaterial() {
               <input
                 placeholder="Quantity"
                 value={form.quantity}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    quantity: e.target.value,
-                  })
-                }
+                onChange={(e) => setForm({ ...form, quantity: e.target.value })}
                 required
               />
             </div>
@@ -222,12 +207,7 @@ function UploadMaterial() {
             <textarea
               placeholder="Description (optional)"
               value={form.description}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  description: e.target.value,
-                })
-              }
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
 
             {/* LOCATION */}
@@ -237,9 +217,7 @@ function UploadMaterial() {
               <input
                 placeholder="Search campus, lab, city..."
                 value={query}
-                onChange={(e) =>
-                  searchLocation(e.target.value)
-                }
+                onChange={(e) => searchLocation(e.target.value)}
                 required
               />
 
@@ -259,15 +237,8 @@ function UploadMaterial() {
                       className="suggestion-item"
                       onClick={() => selectLocation(place)}
                     >
-                      <strong>
-                        {place.name ||
-                          place.address.suburb ||
-                          place.address.city}
-                      </strong>
-                      <span>
-                        {place.address.city ||
-                          place.address.state}
-                      </span>
+                      <strong>{place.name || place.address.suburb || place.address.city}</strong>
+                      <span>{place.address.city || place.address.state}</span>
                     </div>
                   ))}
                 </div>
@@ -281,11 +252,7 @@ function UploadMaterial() {
             />
 
             {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="preview"
-              />
+              <img src={imagePreview} alt="preview" className="preview" />
             )}
 
             <button type="submit" className="submit-btn">

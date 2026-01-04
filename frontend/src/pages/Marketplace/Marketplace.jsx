@@ -1,48 +1,42 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // 👈 Import useNavigate
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Marketplace.css";
 
 function Marketplace() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 👈 Initialize hook
   const user = JSON.parse(localStorage.getItem("user"));
 
   // DATA STATE
-  const [materials, setMaterials] = useState([]); // Items for SALE
-  const [marketRequests, setMarketRequests] = useState([]); // Items WANTED
-  const [myRequests, setMyRequests] = useState([]); // Transactions I initiated
+  const [materials, setMaterials] = useState([]);
+  const [marketRequests, setMarketRequests] = useState([]);
+  const [myRequests, setMyRequests] = useState([]);
 
   // FILTER STATE
-  const [viewMode, setViewMode] = useState("materials"); // 'materials' or 'requests'
+  const [viewMode, setViewMode] = useState("materials");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Fetch Materials (For Sale)
         const matSnap = await getDocs(collection(db, "materials"));
         setMaterials(matSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-        // 2. Fetch Market Requests (People wanting to buy)
         const marketReqSnap = await getDocs(collection(db, "market_requests"));
         setMarketRequests(marketReqSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-        // 3. Fetch Transaction Requests (To check status of buttons)
         const reqSnap = await getDocs(collection(db, "requests"));
         setMyRequests(reqSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
   }, []);
 
-  // --- LOGIC FOR BUYING (Requesting an Item) ---
   const requestMaterial = async (item) => {
     if (!user) return alert("Please login");
     try {
@@ -63,29 +57,20 @@ function Marketplace() {
     }
   };
 
-  // --- LOGIC FOR FULFILLING (Responding to a Buyer Request) ---
   const fulfillRequest = (reqItem) => {
     if (!user) return alert("Please login");
-    // Ideally, this opens a chat or a "Proposal" form.
-    // For now, we'll just alert.
-    alert(`You can contact ${reqItem.requesterName} to fulfill their request for ${reqItem.materialName}. (Chat feature coming soon)`);
+    alert(`You can contact ${reqItem.requesterName} to fulfill their request for ${reqItem.materialName}.`);
   };
 
-  // --- FILTERING LOGIC ---
   const getFilteredData = () => {
     const dataToFilter = viewMode === "materials" ? materials : marketRequests;
-
     return dataToFilter.filter((item) => {
-      // Common Filters
       if (viewMode === "materials" && item.status === "unavailable") return false;
-      
       const name = (item.name || item.materialName || "").toLowerCase();
       const cat = item.category || "All";
       const term = search.toLowerCase();
-
       const matchSearch = name.includes(term);
       const matchCategory = category === "All" || cat === category;
-
       return matchSearch && matchCategory;
     });
   };
@@ -95,11 +80,9 @@ function Marketplace() {
   return (
     <>
       <Navbar />
-
       <div className="marketplace">
         <h2>Marketplace</h2>
 
-        {/* --- TABS --- */}
         <div className="market-tabs">
           <button 
             className={`tab-btn ${viewMode === "materials" ? "active" : ""}`}
@@ -115,14 +98,12 @@ function Marketplace() {
           </button>
         </div>
 
-        {/* --- CONTROLS --- */}
         <div className="marketplace-controls">
           <input
             placeholder={viewMode === "materials" ? "Search items..." : "Search requests..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
             <option>All</option>
             <option>Metal</option>
@@ -133,14 +114,11 @@ function Marketplace() {
           </select>
         </div>
 
-        {/* --- GRID --- */}
         <div className="materials-grid">
           {displayedItems.length === 0 ? (
             <p className="no-items">No items found in this category.</p>
           ) : (
             displayedItems.map((item) => {
-              
-              // --- RENDER MATERIALS FOR SALE ---
               if (viewMode === "materials") {
                 const myRequest = user ? myRequests.find(r => r.materialId === item.id && r.consumerId === user.uid) : null;
                 
@@ -154,6 +132,19 @@ function Marketplace() {
                       <p className="loc">📍 {item.location}</p>
                     </div>
                     <div className="card-actions">
+                      {/* 👇 THIS IS THE NEW MAP BUTTON 👇 */}
+                      {item.lat && item.lng && (
+                        <button 
+                          className="map-btn"
+                          onClick={() => navigate('/map', { 
+                            state: { lat: item.lat, lng: item.lng, title: item.name } 
+                          })}
+                          style={{ marginRight: '10px', backgroundColor: '#3498db', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          🗺️ View Map
+                        </button>
+                      )}
+
                       {myRequest ? (
                          <button className={`request-btn ${myRequest.status}`} disabled>
                            {myRequest.status === "approved" ? "Accepted" : "Pending"}
@@ -164,28 +155,20 @@ function Marketplace() {
                     </div>
                   </div>
                 );
-              } 
-              
-              // --- RENDER BUYER REQUESTS ---
-              else {
+              } else {
                 return (
                   <div className="material-card request-type-card" key={item.id}>
                     <div className="card-badge">WANTED</div>
                     <div className="card-content">
                       <h3>{item.materialName}</h3>
-                      <p><strong>Category:</strong> {item.category}</p>
                       <p><strong>Needed:</strong> {item.quantity}</p>
                       <p className="desc">"{item.message}"</p>
                       <p className="sub-text">Posted by: {item.requesterName}</p>
                     </div>
                     <div className="card-actions">
-                      {user && user.uid === item.requesterId ? (
-                        <button className="own-post-btn" disabled>My Post</button>
-                      ) : (
-                        <button className="fulfill-btn" onClick={() => fulfillRequest(item)}>
-                          🤝 Contact Buyer
-                        </button>
-                      )}
+                      <button className="fulfill-btn" onClick={() => fulfillRequest(item)}>
+                        🤝 Contact Buyer
+                      </button>
                     </div>
                   </div>
                 );

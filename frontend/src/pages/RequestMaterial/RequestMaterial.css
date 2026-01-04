@@ -1,38 +1,61 @@
 .request-container {
   padding: 32px;
+  padding-top: 110px; /* 👈 FIX: Pushes content down below the Navbar */
   max-width: 500px;
-  margin: auto;
+  margin: 0 auto; /* Centers the form horizontally */
 }
 
 .request-container h2 {
   color: #166534;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  text-align: center; /* Optional: Looks better centered */
+}
+
+.sub-text {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  margin-top: 0;
 }
 
 .request-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 15px;
+  background: white; /* Optional: adds a card look */
+  padding: 20px;     /* Optional */
+  border-radius: 15px; /* Optional */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Optional: nice shadow */
 }
 
 .request-form input,
 .request-form select,
 .request-form textarea {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
 .request-form textarea {
-  min-height: 90px;
+  min-height: 100px;
+  resize: vertical;
 }
 
 .request-form button {
   background: #15803d;
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+
+.request-form button:hover {
+  background: #166534;
 }
